@@ -57,9 +57,15 @@ export class LoginUserUseCase implements ILoginUserUseCase {
             };
         }
 
-        return {
+        if (tokenResult.data)
+            return {    
+                success: true,
+                data: tokenResult.data
+            };
+        
+        return {    
             success: true,
-            data: tokenResult.data
+            errors: ["Could not grab user data from token"],
         };
     }
 }

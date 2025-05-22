@@ -1,19 +1,12 @@
 import { User } from "../domain/User";
 import { IUserRepo } from "../infrastructure/IUserRepo";
+import { CreateUserDto } from "../shared/Dtos/CreateUserDto";
+import { DisplayUserDto } from "../shared/Dtos/DisplayUserDto";
 import { IPasswordHasher } from "../shared/IPasswordHasher";
 import { IUseCase } from "../shared/IUseCase";
 import { IUseCaseResult } from "../shared/IUseCaseResult";
 
-interface ICreateUserDto {
-    email: string;
-    password: string;
-    name: string;
-}
-
-export interface ICreateUserCaseResult extends IUseCaseResult<ICreateUserDto> {}
-
-export interface ICreateUserUseCase
-    extends IUseCase<ICreateUserDto, ICreateUserCaseResult> {}
+export interface ICreateUserUseCase extends IUseCase<CreateUserDto, IUseCaseResult<DisplayUserDto>> {}
 
 export class CreateUserUseCase implements ICreateUserUseCase {
     constructor(
@@ -25,12 +18,11 @@ export class CreateUserUseCase implements ICreateUserUseCase {
         name,
         email,
         password,
-    }: ICreateUserDto): Promise<ICreateUserCaseResult> {
+    }: CreateUserDto): Promise<IUseCaseResult<DisplayUserDto>> {
         const existingUser = await this.userRepository.getByEmail(email);
         if (existingUser) {
             return {
                 success: false,
-                data: null,
                 errors: ["User already exists"],
             };
         }
@@ -39,7 +31,6 @@ export class CreateUserUseCase implements ICreateUserUseCase {
         if (!newUserResult.isValid || !newUserResult.data) {
             return {
                 success: false,
-                data: null,
                 errors: newUserResult.errors,
             };
         }
@@ -51,10 +42,11 @@ export class CreateUserUseCase implements ICreateUserUseCase {
 
         await this.userRepository.create(newUserResult.data);
         // TODO: creating inside the user repo may return false, handle later.
+
+        const userDto = DisplayUserDto.from(newUserResult.data);
         return {
             success: true,
-            data: newUserResult.data,
-            errors: [],
-        };
+            data: userDto
+        } 
     }
 }
