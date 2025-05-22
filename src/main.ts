@@ -11,6 +11,11 @@ import { LoginUserController } from "./presentation/controllers/LoginUserControl
 import { JwtService } from "./infrastructure/JwtService";
 import { AuthMiddleware } from "./presentation/middleware/AuthMiddleware";
 
+import { PrismaClient } from "@prisma/client";
+
+import { PrismaUserRepo } from "./infrastructure/PrismaUserRepo";
+import { IUserRepo } from "./infrastructure/IUserRepo";
+
 async function main(): Promise<void> {
     dotenv.config({ path: "local.env" });
     const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
@@ -20,23 +25,28 @@ async function main(): Promise<void> {
     }
     const PORT = Number(process.env.PORT) || 3000;
 
-    const inMemoryRepo = new InMemoryUserRepo();
-    const passwordHasher = new PasswordHasher(SALT_ROUNDS);
+    // User Repo
+    const prismaClient = new PrismaClient();
+    const userRepo: IUserRepo = new PrismaUserRepo(prismaClient);
+    // const userRepo: IUserRepo = new InMemoryUserRepo();
 
-    const createUserUseCase = new CreateUserUseCase(
-        inMemoryRepo,
-        passwordHasher
-    );
+
+    const passwordHasher = new PasswordHasher(SALT_ROUNDS);
+    const createUserUseCase = new CreateUserUseCase({
+        userRepo,
+        passwordHasher,
+    });
+    
     const createUserController = new CreateUserController(createUserUseCase);
 
-    const getUsersUseCase = new GetUsersUseCase(inMemoryRepo);
+    const getUsersUseCase = new GetUsersUseCase(userRepo);
     const getUsersController = new GetUsersController(getUsersUseCase);
 
     const jwtService = new JwtService(JWT_SECRET);
     const authMiddleware = AuthMiddleware(jwtService);
 
     const loginUserUseCase = new LoginUserUseCase(
-        inMemoryRepo,
+        userRepo,
         jwtService,
         passwordHasher
     );
