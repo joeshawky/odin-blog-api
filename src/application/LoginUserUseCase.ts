@@ -48,7 +48,10 @@ export class LoginUserUseCase implements ILoginUserUseCase {
             };
         }
 
-        const tokenResult = this._jwtService.generateToken(user.id);
+        const tokenResult = this._jwtService.generateToken({
+            username: user.name,
+            email: user.email,
+        });
         if (!tokenResult.isValid) {
             return {
                 success: false,
