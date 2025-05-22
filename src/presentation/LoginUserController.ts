@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IController } from "../shared/IController";
 import { ILoginUserUseCase } from "../application/LoginUserUseCase";
-import { SendApiResponse } from "./ApiResponse";
+import { SendApiResponse } from "./SendApiResponse";
 
 export class LoginUserController implements IController {
     public constructor(private readonly _loginUserUseCase: ILoginUserUseCase) {}
@@ -14,7 +14,7 @@ export class LoginUserController implements IController {
                 statusCode: 400,
                 errors: ["Email and password are required"],
             });
-            
+
         const usersResult = await this._loginUserUseCase.execute({
             email,
             password,
