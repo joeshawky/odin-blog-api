@@ -4,16 +4,16 @@ import { IPasswordHasher } from "../shared/IPasswordHasher";
 import { IUseCase } from "../shared/IUseCase";
 import { IUseCaseResult } from "../shared/IUseCaseResult";
 
-interface CreateUserDto {
+interface ICreateUserDto {
     email: string;
     password: string;
     name: string;
 }
 
-export interface ICreateUserCaseResult extends IUseCaseResult<CreateUserDto> {}
+export interface ICreateUserCaseResult extends IUseCaseResult<ICreateUserDto> {}
 
 export interface ICreateUserUseCase
-    extends IUseCase<CreateUserDto, ICreateUserCaseResult> {}
+    extends IUseCase<ICreateUserDto, ICreateUserCaseResult> {}
 
 export class CreateUserUseCase implements ICreateUserUseCase {
     constructor(
@@ -25,7 +25,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
         name,
         email,
         password,
-    }: CreateUserDto): Promise<ICreateUserCaseResult> {
+    }: ICreateUserDto): Promise<ICreateUserCaseResult> {
         const existingUser = await this.userRepository.getByEmail(email);
         if (existingUser) {
             return {
