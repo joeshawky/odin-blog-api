@@ -9,6 +9,7 @@ import { GetUsersUseCase } from "./application/GetUsersUseCase";
 import { LoginUserUseCase } from "./application/LoginUserUseCase";
 import { LoginUserController } from "./presentation/LoginUserController";
 import { JwtService } from "./infrastructure/JwtService";
+import { AuthMiddleware } from "./presentation/middleware/AuthMiddleware";
 
 async function main(): Promise<void> {
     dotenv.config({ path: "local.env" });
@@ -22,18 +23,32 @@ async function main(): Promise<void> {
     const inMemoryRepo = new InMemoryUserRepo();
     const passwordHasher = new PasswordHasher(SALT_ROUNDS);
 
-    const createUserUseCase = new CreateUserUseCase(inMemoryRepo, passwordHasher);
+    const createUserUseCase = new CreateUserUseCase(
+        inMemoryRepo,
+        passwordHasher
+    );
     const createUserController = new CreateUserController(createUserUseCase);
 
     const getUsersUseCase = new GetUsersUseCase(inMemoryRepo);
     const getUsersController = new GetUsersController(getUsersUseCase);
 
     const jwtService = new JwtService(JWT_SECRET);
+    const authMiddleware = AuthMiddleware(jwtService);
 
-    const loginUserUseCase = new LoginUserUseCase(inMemoryRepo, jwtService, passwordHasher);
+    const loginUserUseCase = new LoginUserUseCase(
+        inMemoryRepo,
+        jwtService,
+        passwordHasher
+    );
     const loginUserController = new LoginUserController(loginUserUseCase);
-    
-    ApiServer.run(PORT, createUserController, getUsersController, loginUserController);
+
+    ApiServer.run({
+        port: PORT,
+        authMiddleware,
+        createUserController,
+        getUsersController,
+        loginUserController,
+    });
 }
 
 main();
