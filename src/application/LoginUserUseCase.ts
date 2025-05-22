@@ -23,16 +23,10 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         private _passwordHasher: IPasswordHasher
     ) {}
 
-    async execute(input: ILoginUserDto): Promise<ILoginUserResult> {
-        const { email, password } = input;
-        if (!email || !password) {
-            return {
-                success: false,
-                data: null,
-                errors: ["Email and password are required"],
-            };
-        }
-
+    async execute({
+        email,
+        password,
+    }: ILoginUserDto): Promise<ILoginUserResult> {
         const user = await this._userRepo.getByEmail(email);
         if (!user) {
             return {

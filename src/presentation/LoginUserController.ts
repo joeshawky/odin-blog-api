@@ -8,6 +8,13 @@ export class LoginUserController implements IController {
 
     async handle(req: Request, res: Response): Promise<void> {
         const { email, password } = req.body;
+        if (!email || !password)
+            return SendApiResponse({
+                res,
+                statusCode: 400,
+                errors: ["Email and password are required"],
+            });
+            
         const usersResult = await this._loginUserUseCase.execute({
             email,
             password,
@@ -21,7 +28,7 @@ export class LoginUserController implements IController {
             });
             return;
         }
-        
+
         SendApiResponse({
             res,
             statusCode: 400,
