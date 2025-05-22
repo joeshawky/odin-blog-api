@@ -1,6 +1,6 @@
 import express, { RequestHandler } from "express";
-import { CreateUserController } from "./CreateUserController";
-import { GetUsersController } from "./GetUsersController";
+import { CreateUserController } from "./controllers/CreateUserController";
+import { GetUsersController } from "./controllers/GetUsersController";
 import {} from "express"
 interface ApiServerRunProps {
     port: number;

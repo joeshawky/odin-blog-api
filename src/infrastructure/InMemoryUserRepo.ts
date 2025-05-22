@@ -1,4 +1,4 @@
-import { User, UserDisplayDto } from "../domain/User";
+import { User } from "../domain/User";
 import { IUserRepo } from "./IUserRepo";
 
 export class InMemoryUserRepo implements IUserRepo {
