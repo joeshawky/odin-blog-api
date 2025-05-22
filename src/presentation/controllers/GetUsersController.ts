@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { IController } from "../shared/IController";
-import { IGetUsersUseCase } from "../application/GetUsersUseCase";
+import { IController } from "../../shared/IController";
+import { IGetUsersUseCase } from "../../application/GetUsersUseCase";
 import { SendApiResponse } from "./SendApiResponse";
 
 export class GetUsersController implements IController {

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { IJwtService } from "../../shared/IJwtService";
-import { SendApiResponse } from "../SendApiResponse";
+import { SendApiResponse } from "../controllers/SendApiResponse";
 
 export function AuthMiddleware(
     jwtService: IJwtService

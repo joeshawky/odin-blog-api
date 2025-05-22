@@ -1,7 +1,7 @@
-import { ICreateUserUseCase } from "../application/CreateUserUseCase";
+import { ICreateUserUseCase } from "../../application/CreateUserUseCase";
 import { Request, Response } from "express";
-import { IController } from "../shared/IController";
-import { SendApiResponse } from "./SendApiResponse";
+import { IController } from "../../shared/IController";
+import { SendApiResponse } from "./SendApiResponse"; 
 
 export class CreateUserController implements IController {
     public constructor(

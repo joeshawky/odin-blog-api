@@ -1,13 +1,13 @@
 import { ApiServer } from "./presentation/ApiServer";
 import dotenv from "dotenv";
-import { CreateUserController } from "./presentation/CreateUserController";
+import { CreateUserController } from "./presentation/controllers/CreateUserController";
 import { CreateUserUseCase } from "./application/CreateUserUseCase";
 import { InMemoryUserRepo } from "./infrastructure/InMemoryUserRepo";
 import { PasswordHasher } from "./infrastructure/PasswordHasher";
-import { GetUsersController } from "./presentation/GetUsersController";
+import { GetUsersController } from "./presentation/controllers/GetUsersController";
 import { GetUsersUseCase } from "./application/GetUsersUseCase";
 import { LoginUserUseCase } from "./application/LoginUserUseCase";
-import { LoginUserController } from "./presentation/LoginUserController";
+import { LoginUserController } from "./presentation/controllers/LoginUserController";
 import { JwtService } from "./infrastructure/JwtService";
 import { AuthMiddleware } from "./presentation/middleware/AuthMiddleware";
 
