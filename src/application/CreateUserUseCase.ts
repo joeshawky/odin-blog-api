@@ -21,16 +21,11 @@ export class CreateUserUseCase implements ICreateUserUseCase {
         private _passwordHasher: IPasswordHasher
     ) {}
 
-    async execute(userData: CreateUserDto): Promise<ICreateUserCaseResult> {
-        const { email, password, name } = userData;
-        if (!email || !password || !name) {
-            return {
-                success: false,
-                data: null,
-                errors: ["Email, password, and name are required"],
-            };
-        }
-
+    async execute({
+        name,
+        email,
+        password,
+    }: CreateUserDto): Promise<ICreateUserCaseResult> {
         const existingUser = await this.userRepository.getByEmail(email);
         if (existingUser) {
             return {
