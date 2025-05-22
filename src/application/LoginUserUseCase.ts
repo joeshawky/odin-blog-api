@@ -31,7 +31,6 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         if (!user) {
             return {
                 success: false,
-                data: null,
                 errors: ["User not found"],
             };
         }
@@ -43,7 +42,6 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         if (!isPasswordValid) {
             return {
                 success: false,
-                data: null,
                 errors: ["Invalid password"],
             };
         }
@@ -55,15 +53,20 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         if (!tokenResult.isValid) {
             return {
                 success: false,
-                data: null,
                 errors: tokenResult.errors,
             };
         }
 
+        if (tokenResult.data)
+            return {
+                success: true,
+                data: tokenResult.data,
+                errors: [],
+            };
+
         return {
-            success: true,
-            data: tokenResult.data,
-            errors: [],
+            success: false,
+            errors: ["Could not grab token"],
         };
     }
 }
