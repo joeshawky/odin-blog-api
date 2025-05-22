@@ -1,28 +1,4 @@
 import {randomUUID} from "crypto";
-import { IUserDisplayDto } from "../shared/Dtos/IUserDIsplay";
-import { IUserCreateDto } from "../shared/Dtos/IUserCreate";
-
-export class UserDisplayDto implements IUserDisplayDto {
-    constructor(
-        public readonly name: string,
-        public readonly email: string
-    ) {}
-
-    public static from(user: User): UserDisplayDto {
-        return new UserDisplayDto(user.name, user.email);
-    }
-}
-
-export class UserCreateDto implements IUserCreateDto{
-    constructor(
-        public name: string,
-        public email: string,
-        public password: string
-    ) {}
-    public static from(user: User): UserCreateDto {
-        return new UserCreateDto(user.name, user.email, user.password);
-    }
-}
 
 export class User {
     private static readonly NAME_MIN_LENGTH = 3;
