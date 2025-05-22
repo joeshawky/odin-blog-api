@@ -1,6 +1,6 @@
 export interface IUseCaseResult<T> {
     success: boolean;
-    data?: T | null;
+    data?: T;
     errors?: string[];
 }
 
