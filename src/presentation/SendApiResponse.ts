@@ -25,11 +25,13 @@ export function SendApiResponse<dataType>({
     data,
     errors,
 }: SendApiResponseType<dataType>): void {
-    if (errors && errors.length > 0)
+    if (errors && errors.length > 0) {
         res.status(statusCode).json({
             status: "error",
             errors,
         } as IErrorResponse);
+        return;
+    }
 
     res.status(statusCode).json({
         status: "success",
