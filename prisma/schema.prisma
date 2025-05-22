@@ -4,12 +4,23 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// npx prisma migrate dev --name add_user
+// npx prisma studio
+
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  // output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(20)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(100) // bcrypt hashes are usually < 60 chars, 100 is safe
+  createdAt DateTime @default(now())
 }
