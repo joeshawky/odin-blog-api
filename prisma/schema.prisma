@@ -18,9 +18,31 @@ datasource db {
 }
 
 model User {
+  id        String    @id @default(uuid())
+  name      String    @db.VarChar(20)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(100) // bcrypt hashes are usually < 60 chars, 100 is safe
+  createdAt DateTime  @default(now())
+  posts     Post[]
+  comments   Comment[]
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  title     String    @db.VarChar(255)
+  content   String    @db.VarChar(1024)
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  comments  Comment[]
+}
+
+model Comment {
   id        String   @id @default(uuid())
-  name      String   @db.VarChar(20)
-  email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(100) // bcrypt hashes are usually < 60 chars, 100 is safe
+  content   String   @db.VarChar(1024)
   createdAt DateTime @default(now())
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
 }
