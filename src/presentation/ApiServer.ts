@@ -1,22 +1,23 @@
 import express, { RequestHandler } from "express";
-import { CreateUserController } from "./controllers/CreateUserController";
-import { GetUsersController } from "./controllers/GetUsersController";
 import {} from "express"
+import { UserControllerHandlers } from "./controllers/UserController";
+import { PostControllerHandlers } from "./controllers/PostController";
+import { CommentControllerHandlers } from "./controllers/CommentController";
 interface ApiServerRunProps {
     port: number;
-    createUserController: CreateUserController;
-    getUsersController: GetUsersController;
-    loginUserController: any;
-    authMiddleware: RequestHandler
+    userController: UserControllerHandlers;
+    postController: PostControllerHandlers;
+    commentController: CommentControllerHandlers;
+    authMiddleware: RequestHandler;
 }
 
 export class ApiServer {
     public static async run({
         port,
         authMiddleware,
-        createUserController,
-        getUsersController,
-        loginUserController,
+        userController,
+        commentController,
+        postController
     }: ApiServerRunProps): Promise<void> {
         const app = express();
         app.use(express.json());
@@ -29,10 +30,17 @@ export class ApiServer {
             res.send("Not Authenticated");
         });
 
-        app.post("/users", (req, res) => createUserController.handle(req, res));
-        app.get("/users", (req, res) => getUsersController.handle(req, res));
-        
-        app.post("/login", (req, res) => loginUserController.handle(req, res));
+        app.post("/users", (req, res) => userController.createUserHandler(req, res));
+        app.get("/users", (req, res) => userController.getUsersHandler(req, res));
+        app.get("/usersWithPosts", (req, res) => userController.getUsersWithPostsHandler(req, res));
+
+        app.get("/posts", (req, res) => postController.getPostsHandler(req, res))
+        app.post("/posts", authMiddleware, (req, res) => postController.createPostHandler(req, res));
+
+        app.get("/comments", (req, res) => commentController.getCommentsHandler(req, res))
+        app.post("/comments", (req, res) => commentController.createCommentHandler(req, res))
+
+        app.post("/login", (req, res) => userController.loginUserHandler(req, res));
 
         app.listen(port, () => {
             console.log(`Server is running on port ${port}`);

@@ -1,20 +1,23 @@
 import { ApiServer } from "./presentation/ApiServer";
 import dotenv from "dotenv";
-import { CreateUserController } from "./presentation/controllers/CreateUserController";
 import { CreateUserUseCase } from "./application/CreateUserUseCase";
-import { InMemoryUserRepo } from "./infrastructure/InMemoryUserRepo";
 import { PasswordHasher } from "./infrastructure/PasswordHasher";
-import { GetUsersController } from "./presentation/controllers/GetUsersController";
 import { GetUsersUseCase } from "./application/GetUsersUseCase";
 import { LoginUserUseCase } from "./application/LoginUserUseCase";
-import { LoginUserController } from "./presentation/controllers/LoginUserController";
 import { JwtService } from "./infrastructure/JwtService";
 import { AuthMiddleware } from "./presentation/middleware/AuthMiddleware";
-
 import { PrismaClient } from "@prisma/client";
-
-import { PrismaUserRepo } from "./infrastructure/PrismaUserRepo";
-import { IUserRepo } from "./infrastructure/IUserRepo";
+import { buildUserController } from "./presentation/controllers/UserController";
+import { buildPostController } from "./presentation/controllers/PostController";
+import { CreatePostUseCase } from "./application/CreatePostUseCase";
+import { GetPostsUseCase } from "./application/GetPostsUseCase";
+import { PrismaPostRepo } from "./infrastructure/prisma/PrismaPostRepo";
+import { GetUsersWIthPostsUseCase } from "./application/GetUsersWithPostsUseCase";
+import { buildCommentController } from "./presentation/controllers/CommentController";
+import { CreateCommentUseCase } from "./application/CreateCommentUseCase";
+import { PrismaCommentRepo } from "./infrastructure/prisma/PrismaCommentRepo";
+import { GetCommentsUseCase } from "./application/GetCommentsUseCase";
+import { PrismaUserRepo } from "./infrastructure/prisma/PrismaUserRepo";
 
 async function main(): Promise<void> {
     dotenv.config({ path: "local.env" });
@@ -25,39 +28,60 @@ async function main(): Promise<void> {
     }
     const PORT = Number(process.env.PORT) || 3000;
 
-    // User Repo
+    // Repos
     const prismaClient = new PrismaClient();
-    const userRepo: IUserRepo = new PrismaUserRepo(prismaClient);
-    // const userRepo: IUserRepo = new InMemoryUserRepo();
+    const userRepo = new PrismaUserRepo(prismaClient);
+    const postRepo = new PrismaPostRepo(prismaClient);
+    const commentRepo = new PrismaCommentRepo(prismaClient)
 
+    // const userRepo = new InMemoryUserRepo();
+    // const postRepo = new InMemorypostRepo();
 
     const passwordHasher = new PasswordHasher(SALT_ROUNDS);
-    const createUserUseCase = new CreateUserUseCase({
-        userRepo,
-        passwordHasher,
-    });
-    
-    const createUserController = new CreateUserController(createUserUseCase);
-
-    const getUsersUseCase = new GetUsersUseCase(userRepo);
-    const getUsersController = new GetUsersController(getUsersUseCase);
 
     const jwtService = new JwtService(JWT_SECRET);
     const authMiddleware = AuthMiddleware(jwtService);
 
+    // User Controller Init
+    const createUserUseCase = new CreateUserUseCase({
+        userRepo,
+        passwordHasher,
+    });
     const loginUserUseCase = new LoginUserUseCase(
         userRepo,
         jwtService,
         passwordHasher
     );
-    const loginUserController = new LoginUserController(loginUserUseCase);
+    const getUsersWithPostsUseCase = new GetUsersWIthPostsUseCase(userRepo);
+    const getUsersUseCase = new GetUsersUseCase(userRepo);
+    const userController = buildUserController({
+        getUsersUseCase,
+        createUserUseCase,
+        loginUserUseCase,
+        getUsersWithPostsUseCase,
+    });
 
+    // Post Controller Init
+    const createPostUseCase = new CreatePostUseCase({ postRepo, userRepo });
+    const getPostsUseCase = new GetPostsUseCase({ postRepo, userRepo });
+    const postController = buildPostController({
+        createPostUseCase,
+        getPostsUseCase,
+    });
+
+    // Comment Controller Init
+    const createCommentUseCase = new CreateCommentUseCase({commentRepo, postRepo, userRepo})
+    const getCommentsUseCase = new GetCommentsUseCase({commentRepo, postRepo, userRepo})
+    const commentController = buildCommentController({
+        createCommentUseCase,
+        getCommentsUseCase
+    });
     ApiServer.run({
         port: PORT,
         authMiddleware,
-        createUserController,
-        getUsersController,
-        loginUserController,
+        postController,
+        userController,
+        commentController
     });
 }
 
