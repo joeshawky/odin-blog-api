@@ -1,7 +1,10 @@
-import { User } from "../domain/User";
-import { IUserRepo } from "./IUserRepo";
+import { User } from "../../domain/User";
+import { IUserRepo } from "../IUserRepo";
 
 export class InMemoryUserRepo implements IUserRepo {
+    getAllWithPosts(): Promise<User[]> {
+        throw new Error("Method not implemented.");
+    }
     private _users: User[] = [];
 
     async getAll(): Promise<User[]> {
@@ -11,6 +14,7 @@ export class InMemoryUserRepo implements IUserRepo {
 
     async create(user: User): Promise<boolean> {
         this._users.push(user);
+        console.log(`newly added use id: ${user.id}`)
         return Promise.resolve(true);
     }
 

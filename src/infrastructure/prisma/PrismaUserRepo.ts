@@ -1,15 +1,21 @@
 import { PrismaClient } from "@prisma/client";
-import { User } from "../domain/User";
-import { IUserRepo } from "./IUserRepo";
+import { User } from "../../domain/User";
+import { IUserRepo } from "../IUserRepo";
 
 export class PrismaUserRepo implements IUserRepo {
     constructor(private _prismaClient: PrismaClient) {}
+
+    getAllWithPosts(): Promise<User[]> {
+        const users = this._prismaClient.user.findMany(
+            {include: {posts: true}}
+        )
+        return users;
+    }
 
     async create(user: User): Promise<boolean> {
         try {
             await this._prismaClient.user.create({
                 data: {
-                    id: user.id,
                     name: user.name,
                     email: user.email,
                     password: user.password,
