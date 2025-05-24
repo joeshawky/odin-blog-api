@@ -1,4 +1,5 @@
 import {randomUUID} from "crypto";
+import { Post } from "./Post";
 
 export class User {
     private static readonly NAME_MIN_LENGTH = 3;
@@ -43,7 +44,8 @@ export class User {
         public email: string,
         public password: string,
         public createdAt: Date = new Date(),
-        public id: string = randomUUID()
+        public id: string = randomUUID(),
+        public posts?: Post[] 
     ) {}
 
     private static validateName(name: string): string[] {

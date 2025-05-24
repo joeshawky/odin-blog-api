@@ -1,15 +1,25 @@
+import { randomUUID } from "crypto";
+import { Comment } from "./Comment";
+
+type PostCreationProps = {
+    title: string;
+    content: string;
+    userId: string;
+    createdAt?: Date;
+};
+
 export class Post {
     private static readonly TITLE_MIN_LENGTH = 3;
     private static readonly TITLE_MAX_LENGTH = 100;
     private static readonly CONTENT_MIN_LENGTH = 10;
     private static readonly CONTENT_MAX_LENGTH = 5000;
 
-    public static Create(
-        title: string,
-        content: string,
-        userId: string,
-        createdAt: Date = new Date()
-    ): IValidationResult<Post> {
+    public static Create({
+        title,
+        content,
+        userId,
+        createdAt = new Date(),
+    }: PostCreationProps): IValidationResult<Post> {
         const titleValidation = this.validateTitle(title);
         const contentValidation = this.validateContent(content);
         const userIdValidation = this.validateUserId(userId);
@@ -39,7 +49,9 @@ export class Post {
         public title: string,
         public content: string,
         public userId: string,
-        public createdAt: Date = new Date()
+        public createdAt: Date = new Date(),
+        public id: string = randomUUID(),
+        public comments?: Comment[],
     ) {}
 
     private static validateTitle(title: string): string[] {
