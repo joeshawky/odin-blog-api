@@ -1,17 +1,17 @@
 import { IUserRepo } from "../infrastructure/IUserRepo";
-import { DisplayUserDto } from "../shared/Dtos/DisplayUserDto";
+import { DisplayUserWithoutPostsDto } from "../shared/Dtos/DisplayUserWithoutPostsDto";
 import { IUseCase } from "../shared/IUseCase";
 import { IUseCaseResult } from "../shared/IUseCaseResult";
 
 export interface IGetUsersUseCase
-    extends IUseCase<null, IUseCaseResult<DisplayUserDto[]>> {}
+    extends IUseCase<null, IUseCaseResult<DisplayUserWithoutPostsDto[]>> {}
 
 export class GetUsersUseCase implements IGetUsersUseCase {
     constructor(private _userRepository: IUserRepo) {}
 
-    async execute(): Promise<IUseCaseResult<DisplayUserDto[]>> {
+    async execute(): Promise<IUseCaseResult<DisplayUserWithoutPostsDto[]>> {
         const users = await this._userRepository.getAll();
-        const usersDtos = users.map((user) => DisplayUserDto.from(user));
+        const usersDtos = users.map((user) => DisplayUserWithoutPostsDto.from(user));
         return {
             success: true,
             data: usersDtos,

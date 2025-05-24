@@ -1,13 +1,13 @@
 import { User } from "../domain/User";
 import { IUserRepo } from "../infrastructure/IUserRepo";
 import { CreateUserDto } from "../shared/Dtos/CreateUserDto";
-import { DisplayUserDto } from "../shared/Dtos/DisplayUserDto";
+import { DisplayUserWithoutPostsDto } from "../shared/Dtos/DisplayUserWithoutPostsDto";
 import { IPasswordHasher } from "../shared/IPasswordHasher";
 import { IUseCase } from "../shared/IUseCase";
 import { IUseCaseResult } from "../shared/IUseCaseResult";
 
 export interface ICreateUserUseCase
-    extends IUseCase<CreateUserDto, IUseCaseResult<DisplayUserDto>> {}
+    extends IUseCase<CreateUserDto, IUseCaseResult<DisplayUserWithoutPostsDto>> {}
 
 interface CreateUserUseCaseProps {
     userRepo: IUserRepo;
@@ -27,7 +27,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
         name,
         email,
         password,
-    }: CreateUserDto): Promise<IUseCaseResult<DisplayUserDto>> {
+    }: CreateUserDto): Promise<IUseCaseResult<DisplayUserWithoutPostsDto>> {
         const existingUser = await this._userRepo.getByEmail(email);
         if (existingUser) {
             return {
@@ -52,7 +52,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
         await this._userRepo.create(newUserResult.data);
         // TODO: creating inside the user repo may return false, handle later.
 
-        const userDto = DisplayUserDto.from(newUserResult.data);
+        const userDto = DisplayUserWithoutPostsDto.from(newUserResult.data);
         return {
             success: true,
             data: userDto,
